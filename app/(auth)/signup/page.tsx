@@ -2,9 +2,22 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { signup } from "@/lib/auth-actions";
 
-export default function SignupPage() {
+export default async function SignupPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const params = await searchParams;
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4">
       <Card className="w-full max-w-md">
@@ -13,30 +26,60 @@ export default function SignupPage() {
             S
           </div>
           <CardTitle className="text-2xl">Create an account</CardTitle>
-          <CardDescription>Start tracking your subscriptions for free</CardDescription>
+          <CardDescription>
+            Start tracking your subscriptions for free
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="space-y-4">
+          {params.error && (
+            <div className="mb-4 rounded-lg bg-red-50 dark:bg-red-950/50 text-red-600 dark:text-red-400 text-sm p-3">
+              {params.error}
+            </div>
+          )}
+
+          <form action={signup} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
-              <Input id="name" type="text" placeholder="Parth Jadhav" />
+              <Input
+                id="name"
+                name="name"
+                type="text"
+                placeholder="Parth Jadhav"
+                required
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" placeholder="you@example.com" />
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                required
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" placeholder="••••••••" />
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="••••••••"
+                required
+                minLength={6}
+              />
             </div>
-            <Button className="w-full bg-teal-600 hover:bg-teal-700">
+            <Button type="submit" className="w-full bg-teal-600 hover:bg-teal-700">
               Create Account
             </Button>
           </form>
 
           <p className="mt-6 text-center text-sm text-slate-600 dark:text-slate-400">
             Already have an account?{" "}
-            <Link href="/login" className="text-teal-600 hover:underline font-medium">
+            <Link
+              href="/login"
+              className="text-teal-600 hover:underline font-medium"
+            >
               Sign in
             </Link>
           </p>
