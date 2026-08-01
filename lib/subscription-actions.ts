@@ -45,6 +45,8 @@ export async function createSubscription(formData: FormData) {
   const billing_cycle = formData.get("billing_cycle") as string;
   const category = (formData.get("category") as string) || "Other";
   const notes = (formData.get("notes") as string) || null;
+  const domain = (formData.get("domain") as string) || null;
+  const logo_url = (formData.get("logo_url") as string) || null;
 
   const payload: SubscriptionInsert & { user_id: string } = {
     user_id: user.id,
@@ -56,6 +58,8 @@ export async function createSubscription(formData: FormData) {
     category,
     status: "active",
     notes: notes || undefined,
+    domain: domain || undefined,
+    logo_url: logo_url || undefined,
     next_billing_date: billing_date,
   };
 

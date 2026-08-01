@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getSubscriptions } from "@/lib/subscription-actions";
-import SubscriptionCard from "@/components/subscriptions/SubscriptionCard";
+import { SubscriptionCard } from "@/components/subscriptions/SubscriptionCard";
 
 export default async function SubscriptionsPage() {
   const subscriptions = await getSubscriptions();

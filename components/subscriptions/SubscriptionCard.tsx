@@ -3,7 +3,11 @@ import { Badge } from "@/components/ui/badge";
 import { deleteSubscription, pauseSubscription } from "@/lib/subscription-actions";
 import { Button } from "@/components/ui/button";
 
-export function SubscriptionCard({ subscription }: { subscription: Subscription }) {
+export function SubscriptionCard({
+  subscription,
+}: {
+  subscription: Subscription;
+}) {
   const amountFormatted = new Intl.NumberFormat("en-IN", {
     style: "currency",
     currency: subscription.currency || "INR",
@@ -18,7 +22,9 @@ export function SubscriptionCard({ subscription }: { subscription: Subscription 
         </div>
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <h3 className="font-medium text-[#171717] truncate">{subscription.name}</h3>
+            <h3 className="font-medium text-[#171717] truncate">
+              {subscription.name}
+            </h3>
             <Badge
               variant="secondary"
               className="text-xs font-normal capitalize bg-[#f2f2f2] text-[#4d4d4d]"
@@ -42,7 +48,12 @@ export function SubscriptionCard({ subscription }: { subscription: Subscription 
 
         {subscription.status === "active" && (
           <form action={pauseSubscription.bind(null, subscription.id)}>
-            <Button type="submit" variant="outline" size="sm" className="rounded-md border-[#ebebeb]">
+            <Button
+              type="submit"
+              variant="outline"
+              size="sm"
+              className="rounded-md border-[#ebebeb]"
+            >
               Pause
             </Button>
           </form>
