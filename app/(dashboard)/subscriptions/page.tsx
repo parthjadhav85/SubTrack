@@ -12,15 +12,16 @@ export default async function SubscriptionsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-[#171717]">
+          <h1 className="text-2xl font-semibold tracking-tight">
             Subscriptions
           </h1>
-          <p className="text-sm text-[#8f8f8f] mt-1">
-            {active.length} active subscription{active.length !== 1 ? "s" : ""}
+          <p className="text-sm text-muted-foreground mt-1">
+            {active.length} active subscription
+            {active.length !== 1 ? "s" : ""}
           </p>
         </div>
         <Link href="/subscriptions/new">
-          <Button className="rounded-full bg-[#171717] hover:bg-black text-white gap-2">
+          <Button className="rounded-full gap-2">
             <Plus className="w-4 h-4" />
             Add Subscription
           </Button>
@@ -28,15 +29,13 @@ export default async function SubscriptionsPage() {
       </div>
 
       {subscriptions.length === 0 ? (
-        <div className="rounded-xl border border-[#ebebeb] bg-white p-16 text-center">
-          <p className="text-[#171717] font-medium mb-1">No subscriptions yet</p>
-          <p className="text-sm text-[#8f8f8f] mb-6">
+        <div className="rounded-xl border border-border bg-card p-16 text-center">
+          <p className="font-medium mb-1">No subscriptions yet</p>
+          <p className="text-sm text-muted-foreground mb-6">
             Add your first subscription to start tracking.
           </p>
           <Link href="/subscriptions/new">
-            <Button className="rounded-full bg-[#171717] hover:bg-black text-white">
-              Add Subscription
-            </Button>
+            <Button className="rounded-full">Add Subscription</Button>
           </Link>
         </div>
       ) : (

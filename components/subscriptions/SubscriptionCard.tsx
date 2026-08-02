@@ -20,13 +20,13 @@ export function SubscriptionCard({
   }).format(Number(subscription.amount));
 
   return (
-    <div className="flex items-center justify-between gap-4 rounded-xl border border-[#ebebeb] bg-white px-5 py-4">
+    <div className="flex items-center justify-between gap-4 rounded-xl border border-border bg-card px-5 py-4">
       <div className="flex items-center gap-4 min-w-0">
         {subscription.logo_url ? (
           <img
             src={subscription.logo_url}
             alt={subscription.name}
-            className="w-10 h-10 rounded-lg object-contain bg-[#f2f2f2] shrink-0"
+            className="w-10 h-10 rounded-lg object-contain bg-muted shrink-0"
             onError={(e) => {
               const img = e.currentTarget;
               if (subscription.domain && !img.dataset.fallback) {
@@ -34,33 +34,23 @@ export function SubscriptionCard({
                 img.src = `https://www.google.com/s2/favicons?domain=${subscription.domain}&sz=128`;
               } else {
                 img.style.display = "none";
-                const fallback = img.nextElementSibling as HTMLElement | null;
-                if (fallback) fallback.style.display = "flex";
               }
             }}
           />
-        ) : null}
-
-        <div
-          className="w-10 h-10 rounded-lg bg-[#f2f2f2] flex items-center justify-center text-sm font-semibold text-[#171717] shrink-0"
-          style={{ display: subscription.logo_url ? "none" : "flex" }}
-        >
-          {subscription.name.charAt(0).toUpperCase()}
-        </div>
+        ) : (
+          <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-sm font-semibold shrink-0">
+            {subscription.name.charAt(0).toUpperCase()}
+          </div>
+        )}
 
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <h3 className="font-medium text-[#171717] truncate">
-              {subscription.name}
-            </h3>
-            <Badge
-              variant="secondary"
-              className="text-xs font-normal capitalize bg-[#f2f2f2] text-[#4d4d4d]"
-            >
+            <h3 className="font-medium truncate">{subscription.name}</h3>
+            <Badge variant="secondary" className="text-xs font-normal capitalize">
               {subscription.status}
             </Badge>
           </div>
-          <p className="text-sm text-[#8f8f8f] mt-0.5">
+          <p className="text-sm text-muted-foreground mt-0.5">
             {subscription.category} · {subscription.billing_cycle}
           </p>
         </div>
@@ -68,20 +58,15 @@ export function SubscriptionCard({
 
       <div className="flex items-center gap-3 shrink-0">
         <div className="text-right">
-          <p className="font-medium text-[#171717]">{amountFormatted}</p>
-          <p className="text-xs text-[#8f8f8f]">
+          <p className="font-medium">{amountFormatted}</p>
+          <p className="text-xs text-muted-foreground">
             Next: {subscription.next_billing_date || subscription.billing_date}
           </p>
         </div>
 
         {subscription.status === "active" && (
           <form action={pauseSubscription.bind(null, subscription.id)}>
-            <Button
-              type="submit"
-              variant="outline"
-              size="sm"
-              className="rounded-md border-[#ebebeb]"
-            >
+            <Button type="submit" variant="outline" size="sm">
               Pause
             </Button>
           </form>
@@ -92,7 +77,7 @@ export function SubscriptionCard({
             type="submit"
             variant="outline"
             size="sm"
-            className="rounded-md border-[#ebebeb] text-red-600 hover:text-red-700"
+            className="text-destructive hover:text-destructive"
           >
             Delete
           </Button>
