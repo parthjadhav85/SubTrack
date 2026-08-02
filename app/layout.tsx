@@ -5,7 +5,18 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "SubTrack – Track all your subscriptions",
-  description: "Never miss a payment. Track, remind and analyze your subscriptions in one place.",
+  description:
+    "Never miss a payment. Track, remind and analyze your subscriptions in one place.",
+
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
+
+  manifest: "/site.webmanifest",
 };
 
 export default function RootLayout({

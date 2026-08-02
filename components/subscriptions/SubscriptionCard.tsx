@@ -1,6 +1,11 @@
+"use client";
+
 import { Subscription } from "@/types/subscription";
 import { Badge } from "@/components/ui/badge";
-import { deleteSubscription, pauseSubscription } from "@/lib/subscription-actions";
+import {
+  deleteSubscription,
+  pauseSubscription,
+} from "@/lib/subscription-actions";
 import { Button } from "@/components/ui/button";
 
 export function SubscriptionCard({
@@ -17,9 +22,32 @@ export function SubscriptionCard({
   return (
     <div className="flex items-center justify-between gap-4 rounded-xl border border-[#ebebeb] bg-white px-5 py-4">
       <div className="flex items-center gap-4 min-w-0">
-        <div className="w-10 h-10 rounded-lg bg-[#f2f2f2] flex items-center justify-center text-sm font-semibold text-[#171717] shrink-0">
+        {subscription.logo_url ? (
+          <img
+            src={subscription.logo_url}
+            alt={subscription.name}
+            className="w-10 h-10 rounded-lg object-contain bg-[#f2f2f2] shrink-0"
+            onError={(e) => {
+              const img = e.currentTarget;
+              if (subscription.domain && !img.dataset.fallback) {
+                img.dataset.fallback = "1";
+                img.src = `https://www.google.com/s2/favicons?domain=${subscription.domain}&sz=128`;
+              } else {
+                img.style.display = "none";
+                const fallback = img.nextElementSibling as HTMLElement | null;
+                if (fallback) fallback.style.display = "flex";
+              }
+            }}
+          />
+        ) : null}
+
+        <div
+          className="w-10 h-10 rounded-lg bg-[#f2f2f2] flex items-center justify-center text-sm font-semibold text-[#171717] shrink-0"
+          style={{ display: subscription.logo_url ? "none" : "flex" }}
+        >
           {subscription.name.charAt(0).toUpperCase()}
         </div>
+
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <h3 className="font-medium text-[#171717] truncate">
