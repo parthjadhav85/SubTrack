@@ -5,6 +5,32 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { SubscriptionInsert } from "@/types/subscription";
 
+function getNextBillingDate(start: string, cycle: string): string {
+  const d = new Date(start + "T00:00:00");
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // If start is today or in the past, move forward until it's in the future
+  while (d <= today) {
+    if (cycle === "weekly") {
+      d.setDate(d.getDate() + 7);
+    } else if (cycle === "monthly") {
+      d.setMonth(d.getMonth() + 1);
+    } else if (cycle === "yearly") {
+      d.setFullYear(d.getFullYear() + 1);
+    } else {
+      // custom
+      if (d <= today) d.setDate(d.getDate() + 1);
+      break;
+    }
+  }
+
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
 export async function getSubscriptions() {
   const supabase = await createClient();
 
@@ -48,6 +74,8 @@ export async function createSubscription(formData: FormData) {
   const domain = (formData.get("domain") as string) || null;
   const logo_url = (formData.get("logo_url") as string) || null;
 
+  const next_billing_date = getNextBillingDate(billing_date, billing_cycle);
+
   const payload: SubscriptionInsert & { user_id: string } = {
     user_id: user.id,
     name,
@@ -60,7 +88,7 @@ export async function createSubscription(formData: FormData) {
     notes: notes || undefined,
     domain: domain || undefined,
     logo_url: logo_url || undefined,
-    next_billing_date: billing_date,
+    next_billing_date,
   };
 
   const { error } = await supabase.from("subscriptions").insert(payload);
@@ -111,4 +139,60 @@ export async function pauseSubscription(id: string) {
 
   revalidatePath("/subscriptions");
   revalidatePath("/dashboard");
+}
+
+export async function getDashboardData() {
+  const subscriptions = await getSubscriptions();
+  const active = subscriptions.filter((s) => s.status === "active");
+
+  const monthlyTotal = active.reduce((sum, s) => {
+    const amount = Number(s.amount) || 0;
+    if (s.billing_cycle === "yearly") return sum + amount / 12;
+    if (s.billing_cycle === "weekly") return sum + amount * 4.33;
+    return sum + amount;
+  }, 0);
+
+  const yearlyTotal = monthlyTotal * 12;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const in7 = new Date(today);
+  in7.setDate(in7.getDate() + 7);
+
+  const upcoming = active
+    .filter((s) => {
+      if (!s.next_billing_date) return false;
+      const d = new Date(s.next_billing_date + "T00:00:00");
+      return d >= today && d <= in7;
+    })
+    .sort(
+      (a, b) =>
+        new Date(a.next_billing_date!).getTime() -
+        new Date(b.next_billing_date!).getTime()
+    )
+    .slice(0, 5);
+
+  const categoryMap: Record<string, number> = {};
+  active.forEach((s) => {
+    const cat = s.category || "Other";
+    const amount = Number(s.amount) || 0;
+    let monthly = amount;
+    if (s.billing_cycle === "yearly") monthly = amount / 12;
+    if (s.billing_cycle === "weekly") monthly = amount * 4.33;
+    categoryMap[cat] = (categoryMap[cat] || 0) + monthly;
+  });
+
+  const categoryBreakdown = Object.entries(categoryMap)
+    .map(([name, value]) => ({ name, value: Math.round(value) }))
+    .sort((a, b) => b.value - a.value);
+
+  return {
+    monthlyTotal: Math.round(monthlyTotal),
+    yearlyTotal: Math.round(yearlyTotal),
+    activeCount: active.length,
+    upcomingCount: upcoming.length,
+    upcoming,
+    categoryBreakdown,
+    recent: active.slice(0, 5),
+  };
 }
