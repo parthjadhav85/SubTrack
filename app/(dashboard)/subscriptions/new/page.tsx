@@ -26,6 +26,9 @@ const CATEGORIES = [
   "Health & Fitness",
   "News",
   "Gaming",
+  "Shopping",
+  "Finance",
+  "Dating",
   "Other",
 ];
 
@@ -37,6 +40,8 @@ type SelectedService = {
 
 export default function NewSubscriptionPage() {
   const [selected, setSelected] = useState<SelectedService | null>(null);
+
+  const isCustom = !selected?.domain || selected?.name === "Custom";
 
   if (!selected) {
     return (
@@ -93,7 +98,7 @@ export default function NewSubscriptionPage() {
               <img
                 src={getServiceLogo(selected.domain)}
                 alt={selected.name}
-                className="w-10 h-10 rounded-lg bg-[#f2f2f2]"
+                className="w-10 h-10 rounded-lg bg-[#f2f2f2] object-contain"
               />
             ) : (
               <div className="w-10 h-10 rounded-lg bg-[#f2f2f2] flex items-center justify-center font-semibold">
@@ -108,29 +113,33 @@ export default function NewSubscriptionPage() {
         </CardHeader>
         <CardContent>
           <form action={createSubscription} className="space-y-5">
-            {/* Hidden fields for name/category/domain/logo */}
-            <input type="hidden" name="name" value={selected.name} />
-            <input type="hidden" name="category" value={selected.category} />
+            {/* Hidden fields */}
+            {!isCustom && (
+              <input type="hidden" name="name" value={selected.name} />
+            )}
             <input type="hidden" name="domain" value={selected.domain} />
             <input
               type="hidden"
               name="logo_url"
               value={selected.domain ? getServiceLogo(selected.domain) : ""}
             />
+            {!isCustom && (
+              <input type="hidden" name="category" value={selected.category} />
+            )}
 
-            {selected.name === "Custom" || !selected.domain ? (
+            {/* Custom name only */}
+            {isCustom && (
               <div className="space-y-2">
-                <Label htmlFor="name_override">Service name</Label>
+                <Label htmlFor="name">Service name</Label>
                 <Input
-                  id="name_override"
+                  id="name"
                   name="name"
                   placeholder="Enter service name"
                   required
                   className="border-[#ebebeb]"
-                  defaultValue=""
                 />
               </div>
-            ) : null}
+            )}
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -164,9 +173,9 @@ export default function NewSubscriptionPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className={`grid gap-4 ${isCustom ? "grid-cols-2" : "grid-cols-1"}`}>
               <div className="space-y-2">
-                <Label htmlFor="billing_date">Next billing date</Label>
+                <Label htmlFor="billing_date">Billing start date</Label>
                 <Input
                   id="billing_date"
                   name="billing_date"
@@ -174,23 +183,29 @@ export default function NewSubscriptionPage() {
                   required
                   className="border-[#ebebeb]"
                 />
+                <p className="text-xs text-[#8f8f8f]">
+                  Next billing date will be calculated automatically
+                </p>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="category_select">Category</Label>
-                <select
-                  id="category_select"
-                  name="category"
-                  defaultValue={selected.category}
-                  className="flex h-9 w-full rounded-md border border-[#ebebeb] bg-white px-3 text-sm"
-                >
-                  {CATEGORIES.map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {/* Category only for Custom */}
+              {isCustom && (
+                <div className="space-y-2">
+                  <Label htmlFor="category">Category</Label>
+                  <select
+                    id="category"
+                    name="category"
+                    defaultValue="Other"
+                    className="flex h-9 w-full rounded-md border border-[#ebebeb] bg-white px-3 text-sm"
+                  >
+                    {CATEGORIES.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">
