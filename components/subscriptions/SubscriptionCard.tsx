@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   deleteSubscription,
   pauseSubscription,
+  restoreSubscription,
 } from "@/lib/subscription-actions";
 import { Button } from "@/components/ui/button";
 
@@ -56,33 +57,39 @@ export function SubscriptionCard({
         </div>
       </div>
 
-      <div className="flex items-center gap-3 shrink-0">
-        <div className="text-right">
-          <p className="font-medium">{amountFormatted}</p>
-          <p className="text-xs text-muted-foreground">
-            Next: {subscription.next_billing_date || subscription.billing_date}
-          </p>
-        </div>
+      <div className="flex items-center gap-2 shrink-0">
+  <div className="text-right mr-1">
+    <p className="font-medium">{amountFormatted}</p>
+    <p className="text-xs text-muted-foreground">
+      Next: {subscription.next_billing_date || subscription.billing_date}
+    </p>
+  </div>
 
-        {subscription.status === "active" && (
-          <form action={pauseSubscription.bind(null, subscription.id)}>
-            <Button type="submit" variant="outline" size="sm">
-              Pause
-            </Button>
-          </form>
-        )}
+  {subscription.status === "active" ? (
+    <form action={pauseSubscription.bind(null, subscription.id)}>
+      <Button type="submit" variant="outline" size="sm">
+        Pause
+      </Button>
+    </form>
+  ) : (
+    <form action={restoreSubscription.bind(null, subscription.id)}>
+      <Button type="submit" variant="outline" size="sm">
+        Restore
+      </Button>
+    </form>
+  )}
 
-        <form action={deleteSubscription.bind(null, subscription.id)}>
-          <Button
-            type="submit"
-            variant="outline"
-            size="sm"
-            className="text-destructive hover:text-destructive"
-          >
-            Delete
-          </Button>
-        </form>
-      </div>
+  <form action={deleteSubscription.bind(null, subscription.id)}>
+    <Button
+      type="submit"
+      variant="outline"
+      size="sm"
+      className="text-destructive hover:text-destructive"
+    >
+      Delete
+    </Button>
+  </form>
+</div>
     </div>
   );
 }
