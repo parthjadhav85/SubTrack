@@ -196,3 +196,46 @@ export async function getDashboardData() {
     recent: active.slice(0, 5),
   };
 }
+export async function restoreSubscription(id: string) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return;
+
+  await supabase
+    .from("subscriptions")
+    .update({ status: "active", updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .eq("user_id", user.id);
+
+  revalidatePath("/subscriptions");
+  revalidatePath("/archived");
+  revalidatePath("/dashboard");
+}
+
+export async function getArchivedSubscriptions() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return [];
+
+  const { data, error } = await supabase
+    .from("subscriptions")
+    .select("*")
+    .eq("user_id", user.id)
+    .eq("status", "paused")
+    .order("updated_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  return data ?? [];
+}
